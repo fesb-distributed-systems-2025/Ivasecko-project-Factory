@@ -132,4 +132,11 @@ $RECYCLE.BIN/
 # Mac desktop service store files
 .DS_Store
 
-_NCrunch*
+# Windows Installer files from build outputs
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+/api/DockerServer.txt
