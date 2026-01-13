@@ -11,7 +11,7 @@ namespace Application.Services
         private readonly IEmailRepository _emailRepository;
         private readonly IWorkerRepository _workerRepository;
 
-        public EmailService(IEmailRepository emailRepository, IWorkerRepository WorkerRepository,) 
+        public EmailService(IEmailRepository emailRepository, IWorkerRepository workerRepository) 
         {
             _emailRepository = emailRepository;
             _workerRepository = workerRepository;
