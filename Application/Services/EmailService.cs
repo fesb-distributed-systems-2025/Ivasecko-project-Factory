@@ -11,7 +11,7 @@ namespace Application.Services
         private readonly IEmailRepository _emailRepository;
         private readonly IWorkerRepository _workerRepository;
 
-        public EmailService(IEmailRepository emailRepository, IWorkerRepository studentRepository,) 
+        public EmailService(IEmailRepository emailRepository, IWorkerRepository WorkerRepository,) 
         {
             _emailRepository = emailRepository;
             _workerRepository = workerRepository;
@@ -59,11 +59,11 @@ namespace Application.Services
 
         private async Task<string> CreateOrUpdateValidation(Email email)
         {
-            var senderId = await _workerRepository.GetStudentById(email.SenderId);
+            var senderId = await _workerRepository.GetWorkerById(email.SenderId);
             if (senderId is null)
                 return "Sender is not found.";
 
-            var receiverId =await _workerRepository.GetStudentById(email.ReceiverId);
+            var receiverId =await _workerRepository.GetWorkerById(email.ReceiverId);
             if (receiverId is null)
                 return "Receiver is not found.";
 
