@@ -8,7 +8,8 @@ namespace Application.Interfaces
         DbSet<Worker> Workers { get; }
         DbSet<User> Users { get; }
         DbSet<Email> Emails { get; }
-
+        DbSet<Position> Positions { get; } 
+        DbSet<Shift> Shifts { get; }
          Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

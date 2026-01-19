@@ -1,4 +1,5 @@
 using Application.DTOs;
+using Application.Interfaces.Services;
 using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,64 +9,54 @@ namespace Api.Controllers
     [ApiController]
     public class WorkerController : ControllerBase
     {
-        //private EmailRespository _emailRespository;
-        public WorkerController(WorkerController emailRespository)
+        private readonly IWorkerService _workerService;
+
+        public WorkerController(IWorkerService workerService)
         {
-            //_emailRespository = emailRespository;
+            _workerService = workerService;
         }
 
-        [HttpGet("Workers")]
-        public IEnumerable<Worker> GetAllWorkers()
+        // GET: api/Worker
+        [HttpGet]
+        public ActionResult<IEnumerable<Worker>> GetAllWorkers()
         {
-            //return _emailRespository.Emails;
-
-            return Enumerable.Empty<Worker>();
+            var workers = _workerService.GetAllWorkers();
+            return Ok(workers);
         }
 
-        [HttpGet("Workers/{id}")]
-        public Worker GetWorkerById()
+        // GET: api/Worker/5
+        [HttpGet("{id}")]
+        public ActionResult<Worker> GetWorkerById(int id)
         {
-            //return _emailRespository.Emails;
+            var worker = _workerService.GetWorkerById(id);
+            if (worker == null)
+                return NotFound($"Worker with Id {id} not found.");
 
-            return new Worker();
+            return Ok(worker);
         }
 
-        [HttpPost("new")]
-        public int AddWorker([FromBody] PostWorkerDTO newWorker)
+        // POST: api/Worker
+        [HttpPost]
+         public async Task<IActionResult> PostWorker([FromBody] PostWorkerDTO worker)
         {
-            //_emailRespository.Emails.Add(email);
-            //return _emailRespository.Emails;
-
-            return 0;
+            var result = await _workerService.AddWorker(worker);
+            return Ok(result);
         }
 
-        [HttpPut("edit")]
-        public int EditWorker([FromBody] Worker Worker)
+        // PUT: api/Worker/5
+        [HttpPut("{id}")]
+         public async Task<IActionResult> EditWorker([FromBody] PutWorkerDTO worker)
         {
-            //var oldEmail = _emailRespository.Emails.FirstOrDefault(x => x.Id == id);
-
-            //if (oldEmail == null)
-            //{
-            //    return _emailRespository.Emails;
-            //}
-
-            //oldEmail.Sender = newEmail.Sender;
-            //oldEmail.Recepient = newEmail.Recepient;
-            //oldEmail.Subject = newEmail.Subject;
-            //oldEmail.Message = newEmail.Message;
-
-            //return _emailRespository.Emails;
-
-            return 0;
+            var result = await _workerService.UpdateWorker(worker);
+            return Ok(result);
         }
 
-        [HttpDelete("delete/{id}")]
-        public int DeleteEmail([FromRoute] int id)
+        // DELETE: api/Worker/5
+        [HttpDelete("{id}")]
+         public async Task<IActionResult> DeleteWorker(int id)
         {
-            //_emailRespository.Emails = _emailRespository.Emails.Where(x => x.Id != id).ToList();
-            //return _emailRespository.Emails;
-
-            return 0;
+            var result = await _workerService.DeleteWorker(id);
+            return Ok(result);
         }
     }
 }

@@ -22,6 +22,12 @@ namespace Application
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IWorkerService, WorkerService>();
 
+            services.AddScoped<IShiftRepository, ShiftRepository>();
+            services.AddScoped<IShiftService, ShiftService>();
+
+            services.AddScoped<IPositionRepository, PositionRepository>();
+            services.AddScoped<IPositionService, PositionService>();
+
 
             return services;
         }

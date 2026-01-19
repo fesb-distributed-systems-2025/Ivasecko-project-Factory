@@ -4,6 +4,11 @@ namespace Application.Interfaces.Repositories
 {
     public interface IWorkerRepository
     {
-        Task<Worker> GetWorkerById(int id);
+        Task<Worker?> GetWorkerById(int id);
+        Task<IEnumerable<Worker>> GetAllWorkers();
+
+        void AddWorker(Worker worker);
+        Task UpdateWorker(Worker worker);
+        Task DeleteWorker(int id);
     }
 }
