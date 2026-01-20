@@ -1,14 +1,9 @@
 namespace Application.Common
 {
-	public class ValidationResult
-	{
-		public bool IsValid { get; set; }
-		public string? ErrorMessage { get; set; }
+    public class ValidationResult
+    {
+        public bool IsSuccess => !ValidationItems.Any();
+        public List<string> ValidationItems { get; set; } = new();
+    }
 
-		public ValidationResult(bool isValid, string? errorMessage = null)
-		{
-			IsValid = isValid;
-			ErrorMessage = errorMessage;
-		}
-	}
 }

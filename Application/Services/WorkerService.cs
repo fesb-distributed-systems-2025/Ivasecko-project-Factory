@@ -1,4 +1,5 @@
 using Application.DTOs;
+using Application.Common;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Domain.Models;
@@ -16,57 +17,82 @@ namespace Application.Services
         _positionRepository = positionRepository;
     }
 
-    public async Task<IEnumerable<Worker>> GetAllWorkers()
+    public async Task<Result<IEnumerable<Worker>>> GetAllWorkers()
     {
-        return await _workerRepository.GetAllWorkers();
+        var workers = await _workerRepository.GetAll();
+            return Result<IEnumerable<Worker>>.Success(workers);
     }
 
-    public async Task<Worker?> GetWorkerById(int id)
+    public async Task<Result<Worker>> GetWorkerById(int id)
     {
-        return await _workerRepository.GetWorkerById(id);
+        var worker = await _workerRepository.GetById(id);
+        if (worker == null)
+            return Result<Worker>.Failure(new List<string> { "Worker not found" });
+
+            return Result<Worker>.Success(worker);
     }
 
-    public async Task<string> AddWorker(PostWorkerDTO workerDto)
+    public async Task<Result<object>> AddWorker(PostWorkerDTO workerDto)
         {
             var workerEntity = workerDto.ToModel();
+            var validation = ValidateWorker(workerEntity);
 
             // Validacija pozicije
-            if (workerDto.PositionId != null)
-            {
-                var position = await _positionRepository.GetById(workerDto.PositionId.Value);
-                if (position == null)
-                    return "Position not found.";
-
-                workerEntity.PositionId = position.Id;
-            }
+            if (!validation.IsSuccess)
+                return Result<object>.Failure(validation.ValidationItems);
 
             _workerRepository.CreateWorker(workerEntity);
-            return $"Worker successfully created with Id: {workerEntity.Id}";
+            await _workerRepository.SaveChangesAsync();
+
+            return Result<object>.Success(workerEntity);
         }
 
-        public async Task<string> UpdateWorker(PutWorkerDTO workerDto)
-        {
-             var workerEntity = workerDto.ToModel();
+        public async Task<Result<Worker>> UpdateWorker(PutWorkerDTO dto)
+{
+    var worker = dto.ToModel(); // mapira DTO u Worker model
 
-        if (workerDto.PositionId != null)
-            {
-                var position = await _positionRepository.GetById(workerDto.PositionId.Value);
-                if (position == null)
-                    return "Position not found.";
+    // validacija
+    var validation = ValidateWorker(worker);
+    if (!validation.IsSuccess)
+        return Result<Worker>.Failure(validation.ValidationItems);
 
-                workerEntity.PositionId = position.Id;
-            }
+    // provjera position
+    if (!string.IsNullOrEmpty(dto.Position))
+    {
+        var position = await _positionRepository.GetById(int.Parse(dto.Position));
+        if (position == null)
+            return Result<Worker>.Failure(new List<string> { "Position not found" });
 
-            await _workerRepository.UpdateWorker(workerEntity);
-           
-    
-    return $"Worker with Id: {workerEntity.Id} successfully updated.";
-        }
-    public async Task<string> DeleteWorker(int id)
+        worker.PositionId = position.Id;
+    }
+
+    // update u repo
+    _workerRepository.Update(worker);
+    await _workerRepository.SaveChangesAsync();
+
+    return Result<Worker>.Success(worker);
+    }   
+
+
+    public async Task<Result<object>> DeleteWorker(int id)
     {
         await _workerRepository.DeleteWorker(id);
-        return $"Worker successfully deleted with Id: {id}";
+        return Result<object>.Success();
     }
+
+    private ValidationResult ValidateWorker(Worker worker)
+        {
+            var result = new ValidationResult();
+
+            if (string.IsNullOrWhiteSpace(worker.Name))
+                result.ValidationItems.Add("Name is required.");
+            if (string.IsNullOrWhiteSpace(worker.Surname))
+                result.ValidationItems.Add("Surname is required.");
+            if (string.IsNullOrWhiteSpace(worker.EmailAddress))
+                result.ValidationItems.Add("EmailAddress is required.");
+
+            return result;
+        }
 }
 
 

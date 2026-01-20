@@ -1,19 +1,24 @@
 namespace Application.Common
 {
-	public class Result<T>
-	{
-		public bool IsSuccess { get; set; }
-		public T? Data { get; set; }
-		public string? ErrorMessage { get; set; }
+    public class Result<T>
+    {
+        public bool IsSuccess { get; }
+        public List<string> ErrorItems { get; }
+        public T Value { get; }
 
-		public static Result<T> Success(T data)
-		{
-			return new Result<T> { IsSuccess = true, Data = data };
-		}
+        private Result(bool isSuccess, List<string> errorList, T value)
+        {
+            IsSuccess = isSuccess;
+            ErrorItems = errorList;
+            Value = value;
+        }
 
-		public static Result<T> Failure(string errorMessage)
-		{
-			return new Result<T> { IsSuccess = false, ErrorMessage = errorMessage };
-		}
-	}
+        // SUCCESS (GET, returns value)
+        public static Result<T> Success(T value) => new Result<T>(true, new List<string>(), value);
+
+        // SUCCESS (POST, no value)
+        public static Result<T> Success() => new Result<T>(true, new List<string>(), default);
+
+        public static Result<T> Failure(List<string> errorList) => new Result<T>(false, errorList, default);
+    }
 }

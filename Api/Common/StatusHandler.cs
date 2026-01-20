@@ -2,16 +2,12 @@ namespace Api.Common
 {
 	public static class StatusHandler
 	{
-		public static IActionResult HandleResult<T>(Result<T> result)
-		{
-			if (result.IsSuccess)
-			{
-				return new OkObjectResult(result.Data!);
-			}
-			else
-			{
-				return new BadRequestObjectResult(new { error = result.ErrorMessage });
-			}
-		}
-	}
+		public static IActionResult HandleResult<T>(this ControllerBase controller, Result<T> result)
+        {
+            if (result.IsSuccess)
+                return controller.Ok(result.Value);
+
+            return controller.BadRequest(result.ErrorItems);
+        }
+    }
 }

@@ -7,7 +7,7 @@ namespace Application.Interfaces.Repositories
         Task<Worker?> GetWorkerById(int id);
         Task<IEnumerable<Worker>> GetAllWorkers();
 
-        void AddWorker(Worker worker);
+        void CreateWorker(Worker worker);
         Task UpdateWorker(Worker worker);
         Task DeleteWorker(int id);
     }
