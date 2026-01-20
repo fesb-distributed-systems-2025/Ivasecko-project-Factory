@@ -1,4 +1,5 @@
 using Application.DTOs;
+using Api.Common;
 using Application.Interfaces.Services;
 using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -17,11 +18,11 @@ namespace Api.Controllers
         }
 
         // GET: api/Worker
-        [HttpGet]
+        [HttpGet("all")]
         public ActionResult<IEnumerable<Worker>> GetAllWorkers()
         {
             var workers = _workerService.GetAllWorkers();
-            return Ok(workers);
+            return this.HandleResult(result);
         }
 
         // GET: api/Worker/5
@@ -32,7 +33,7 @@ namespace Api.Controllers
             if (worker == null)
                 return NotFound($"Worker with Id {id} not found.");
 
-            return Ok(worker);
+            return this.HandleResult(result);
         }
 
         // POST: api/Worker
@@ -40,7 +41,7 @@ namespace Api.Controllers
          public async Task<IActionResult> PostWorker([FromBody] PostWorkerDTO worker)
         {
             var result = await _workerService.AddWorker(worker);
-            return Ok(result);
+            return this.HandleResult(result);
         }
 
         // PUT: api/Worker/5
@@ -48,7 +49,7 @@ namespace Api.Controllers
          public async Task<IActionResult> EditWorker([FromBody] PutWorkerDTO worker)
         {
             var result = await _workerService.UpdateWorker(worker);
-            return Ok(result);
+            return this.HandleResult(result);
         }
 
         // DELETE: api/Worker/5
@@ -56,7 +57,7 @@ namespace Api.Controllers
          public async Task<IActionResult> DeleteWorker(int id)
         {
             var result = await _workerService.DeleteWorker(id);
-            return Ok(result);
+            return this.HandleResult(result);
         }
     }
 }
