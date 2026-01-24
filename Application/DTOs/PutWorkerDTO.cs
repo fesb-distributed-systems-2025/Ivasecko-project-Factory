@@ -8,9 +8,9 @@ namespace Application.DTOs
         public string Name { get; set; }
         public string Surname { get; set; }
         public int? Age { get; set; }
-        public string EmailAddress { get; set; }
-        public int? PositionId { get; set; }      // Naziv pozicije
+        public string EmailAddress { get; set; }  
         public DateTime? BirthDate { get; set; }
+        public int? PositionId { get; set; }
 
         // Pretvorba DTO-a u Worker model
         public Worker ToModel()
@@ -23,7 +23,6 @@ namespace Application.DTOs
 				Age = this.Age,
 				EmailAddress = this.EmailAddress,
 				BirthDate = this.BirthDate,
-				PositionId = this.PositionId
 			};
         }
     }

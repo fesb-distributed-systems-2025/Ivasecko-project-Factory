@@ -8,8 +8,8 @@ namespace Application.DTOs
         public string Surname { get; set; }
         public int? Age { get; set; }
         public string EmailAddress { get; set; }
-        public int? PositionId { get; set; }
         public DateTime? BirthDate { get; set; }
+        public int? PositionId { get; set; }
 
         public Worker ToModel()
         {
@@ -20,7 +20,6 @@ namespace Application.DTOs
                 Age = Age,
                 EmailAddress = EmailAddress,
                 BirthDate = BirthDate,
-                PositionId = PositionId
             };
         }
     }

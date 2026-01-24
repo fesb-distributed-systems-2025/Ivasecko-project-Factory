@@ -8,7 +8,6 @@ namespace Domain.Models
         public int? Age { get; set; }
         public DateTime? BirthDate { get; set; }
         public string EmailAddress { get; set; }
-        public int? PositionId { get; set; } // slično ProgramTypeId kod studenta
 
         #region Navigation Properties
         public Position? Position { get; set; } // nova klasa Position za pozicije radnika

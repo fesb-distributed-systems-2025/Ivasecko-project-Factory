@@ -1,5 +1,6 @@
 using Application.DTOs;
 using Application.Common;
+using Application.Interfaces;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.Services;
 using Domain.Models;
@@ -10,6 +11,7 @@ namespace Application.Services
 {
     private readonly IWorkerRepository _workerRepository;
     private readonly IPositionRepository _positionRepository;
+    private readonly IUnitOfWork _UnitOfWork;
 
     public WorkerService(IWorkerRepository workerRepository, IPositionRepository positionRepository)
     {
@@ -19,13 +21,13 @@ namespace Application.Services
 
     public async Task<Result<IEnumerable<Worker>>> GetAllWorkers()
     {
-        var workers = await _workerRepository.GetAll();
+        var workers = await _workerRepository.GetAllWorkers();
             return Result<IEnumerable<Worker>>.Success(workers);
     }
 
     public async Task<Result<Worker>> GetWorkerById(int id)
     {
-        var worker = await _workerRepository.GetById(id);
+        var worker = await _workerRepository.GetWorkerById(id);
         if (worker == null)
             return Result<Worker>.Failure(new List<string> { "Worker not found" });
 
@@ -42,35 +44,34 @@ namespace Application.Services
                 return Result<object>.Failure(validation.ValidationItems);
 
             _workerRepository.CreateWorker(workerEntity);
-            await _workerRepository.SaveChangesAsync();
+            await _UnitOfWork.SaveChangesAsync();
 
             return Result<object>.Success(workerEntity);
         }
 
-        public async Task<Result<Worker>> UpdateWorker(PutWorkerDTO dto)
+    public async Task<Result<object>> UpdateWorker(PutWorkerDTO dto)
 {
     var worker = dto.ToModel(); // mapira DTO u Worker model
 
     // validacija
     var validation = ValidateWorker(worker);
     if (!validation.IsSuccess)
-        return Result<Worker>.Failure(validation.ValidationItems);
+        return Result<object>.Failure(validation.ValidationItems);
 
     // provjera position
-    if (!string.IsNullOrEmpty(dto.Position))
-    {
-        var position = await _positionRepository.GetById(int.Parse(dto.Position));
-        if (position == null)
-            return Result<Worker>.Failure(new List<string> { "Position not found" });
+    if (dto.PositionId.HasValue)
+{
+    var position = await _positionRepository.GetById(dto.PositionId.Value);
+    if (position == null)
+        return Result<object>.Failure(new List<string> { "Position not found" });
 
-        worker.PositionId = position.Id;
-    }
-
+    worker.Position = position; // ✅ veza preko navigation propertyja
+}
     // update u repo
-    _workerRepository.Update(worker);
-    await _workerRepository.SaveChangesAsync();
+    await _workerRepository.UpdateWorker(worker);
+    await _UnitOfWork.SaveChangesAsync();
 
-    return Result<Worker>.Success(worker);
+    return Result<object>.Success(worker);
     }   
 
 

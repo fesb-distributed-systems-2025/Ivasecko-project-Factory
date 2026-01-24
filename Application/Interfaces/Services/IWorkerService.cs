@@ -8,8 +8,8 @@ namespace Application.Interfaces.Services
     {
         Task<Result<IEnumerable<Worker>>> GetAllWorkers();
         Task<Result<Worker>> GetWorkerById(int id);
-        Task<Result<Worker>> AddWorker(PostWorkerDTO dto);
-        Task<Result<Worker>> UpdateWorker(PutWorkerDTO dto);
-        Task<Result<bool>> DeleteWorker(int id);
+        Task<Result<object>> AddWorker(PostWorkerDTO dto);
+        Task<Result<object>> UpdateWorker(PutWorkerDTO dto);
+        Task<Result<object>> DeleteWorker(int id);
     }
 }

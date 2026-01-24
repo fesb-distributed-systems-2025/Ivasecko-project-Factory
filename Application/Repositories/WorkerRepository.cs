@@ -14,6 +14,8 @@ namespace Application.Repositories
             _dbContext = dbContext;
         }
 
+
+///ovde mozda maknuti async
         public async Task SaveChangesAsync()
         {
             await _dbContext.SaveChangesAsync();
@@ -50,7 +52,7 @@ namespace Application.Repositories
             oldWorker.Age = worker.Age;
             oldWorker.BirthDate = worker.BirthDate;
             oldWorker.EmailAddress = worker.EmailAddress;
-            oldWorker.PositionId = worker.PositionId;
+            oldWorker.Position = worker.Position;
         }
 
         public async Task DeleteWorker(int id)
