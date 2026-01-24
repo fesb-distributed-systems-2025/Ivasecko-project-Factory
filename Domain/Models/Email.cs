@@ -2,6 +2,11 @@ namespace Domain.Models
 {
     public class Email
     {
+
+        public static readonly int SubjectMaxLength = 200;
+        public static readonly int SubjectMinLength = 2;
+        public static readonly int MessageMaxLength = 2000;
+        
         public int Id { get; set; }
 
         public int SenderId { get; set; }

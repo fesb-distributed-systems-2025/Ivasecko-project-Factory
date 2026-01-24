@@ -1,6 +1,10 @@
 using Application.Interfaces;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Application;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.MSSqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +21,21 @@ builder.Services.AddDbContext<IApplicationDbContext, AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")
     )
 );
+
+builder.Services.AddApplication();
+
+// Serilog configuration
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.MSSqlServer(
+        connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
+        sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions { TableName = "Logs" },
+        autoCreateSqlTable: true
+    )
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
 
 var app = builder.Build();
 
@@ -35,6 +54,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ExceptionLoggingMiddleware>();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
+
+//koristimo serilog...nakon error handleanja radi smanjenja mijenjanja podataka u cijelom projektu
