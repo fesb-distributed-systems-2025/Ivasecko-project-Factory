@@ -11,12 +11,13 @@ namespace Application.Services
 {
     private readonly IWorkerRepository _workerRepository;
     private readonly IPositionRepository _positionRepository;
-    private readonly IUnitOfWork _UnitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public WorkerService(IWorkerRepository workerRepository, IPositionRepository positionRepository)
+    public WorkerService(IWorkerRepository workerRepository, IPositionRepository positionRepository, IUnitOfWork unitOfWork)
     {
         _workerRepository = workerRepository;
         _positionRepository = positionRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<IEnumerable<Worker>>> GetAllWorkers()
@@ -44,7 +45,7 @@ namespace Application.Services
                 return Result<object>.Failure(validation.ValidationItems);
 
             _workerRepository.CreateWorker(workerEntity);
-            await _UnitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             return Result<object>.Success(workerEntity);
         }
@@ -69,7 +70,7 @@ namespace Application.Services
 }
     // update u repo
     await _workerRepository.UpdateWorker(worker);
-    await _UnitOfWork.SaveChangesAsync();
+    await _unitOfWork.SaveChangesAsync();
 
     return Result<object>.Success(worker);
     }   

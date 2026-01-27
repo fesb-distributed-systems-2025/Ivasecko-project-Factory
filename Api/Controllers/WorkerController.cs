@@ -19,18 +19,18 @@ namespace Api.Controllers
 
         // GET: api/Worker
         [HttpGet("all")]
-        public ActionResult<IEnumerable<Worker>> GetAllWorkers()
+        public async Task<IActionResult> GetAllWorkers()
         {
-            var workers = _workerService.GetAllWorkers();
+            var result = await _workerService.GetAllWorkers();
             return this.HandleResult(result);
         }
 
         // GET: api/Worker/5
         [HttpGet("{id}")]
-        public ActionResult<Worker> GetWorkerById(int id)
+        public async Task<IActionResult> GetWorkerById(int id)
         {
-            var worker = _workerService.GetWorkerById(id);
-            if (worker == null)
+            var result = await _workerService.GetWorkerById(id);
+            if (result == null)
                 return NotFound($"Worker with Id {id} not found.");
 
             return this.HandleResult(result);
