@@ -18,9 +18,9 @@ namespace Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.10")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("Domain.Models.Email", b =>
                 {
@@ -28,11 +28,11 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Message")
                         .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasColumnType("varchar(2000)");
 
                     b.Property<int>("ReceiverId")
                         .HasColumnType("int");
@@ -43,7 +43,7 @@ namespace Infrastructure.Migrations
                     b.Property<string>("Subject")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("varchar(200)");
 
                     b.HasKey("Id");
 
@@ -54,65 +54,83 @@ namespace Infrastructure.Migrations
                     b.ToTable("Emails");
                 });
 
-            modelBuilder.Entity("Domain.Models.User", b =>
+            modelBuilder.Entity("Domain.Models.Position", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Email")
+                    b.Property<string>("Title")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("longtext");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.HasKey("Id");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                    b.ToTable("Positions");
+                });
 
-                    b.Property<int>("RoleId")
+            modelBuilder.Entity("Domain.Models.Shift", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
+
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time(6)");
+
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time(6)");
+
+                    b.Property<int>("WorkerId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.HasIndex("WorkerId");
+
+                    b.ToTable("Shifts");
                 });
 
             modelBuilder.Entity("Domain.Models.Worker", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("Age")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("BirthDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("EmailAddress")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("varchar(100)");
 
-                    b.Property<string>("Position")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("PositionId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Surname")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PositionId");
 
                     b.ToTable("Workers");
                 });
@@ -136,19 +154,29 @@ namespace Infrastructure.Migrations
                     b.Navigation("Sender");
                 });
 
-            modelBuilder.Entity("Domain.Models.Worker", b =>
+            modelBuilder.Entity("Domain.Models.Shift", b =>
                 {
-                    b.HasOne("Domain.Models.User", null)
-                        .WithOne("Worker")
-                        .HasForeignKey("Domain.Models.Worker", "Id")
+                    b.HasOne("Domain.Models.Worker", "Worker")
+                        .WithMany()
+                        .HasForeignKey("WorkerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Worker");
                 });
 
-            modelBuilder.Entity("Domain.Models.User", b =>
+            modelBuilder.Entity("Domain.Models.Worker", b =>
                 {
-                    b.Navigation("Worker")
-                        .IsRequired();
+                    b.HasOne("Domain.Models.Position", "Position")
+                        .WithMany("Workers")
+                        .HasForeignKey("PositionId");
+
+                    b.Navigation("Position");
+                });
+
+            modelBuilder.Entity("Domain.Models.Position", b =>
+                {
+                    b.Navigation("Workers");
                 });
 
             modelBuilder.Entity("Domain.Models.Worker", b =>
