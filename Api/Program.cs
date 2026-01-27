@@ -5,11 +5,16 @@ using Application;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.MySQL;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Controllers
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        });
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
