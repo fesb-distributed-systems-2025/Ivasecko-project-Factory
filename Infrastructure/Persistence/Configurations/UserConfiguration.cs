@@ -1,37 +1,37 @@
-using Domain.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+// using Domain.Models;
+// using Microsoft.EntityFrameworkCore;
+// using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Persistence.Configurations
-{
-    public class UserConfiguration : IEntityTypeConfiguration<User>
-    {
-        public void Configure(EntityTypeBuilder<User> builder)
-        {
-            // Primary key
-            builder.HasKey(u => u.Id);
+// namespace Infrastructure.Persistence.Configurations
+// {
+//     public class UserConfiguration : IEntityTypeConfiguration<User>
+//     {
+//         public void Configure(EntityTypeBuilder<User> builder)
+//         {
+//             // Primary key
+//             builder.HasKey(u => u.Id);
 
-            // Properties
-            builder.Property(u => u.Email)
-                   .IsRequired()
-                   .HasMaxLength(150);
+//             // Properties
+//             builder.Property(u => u.Email)
+//                    .IsRequired()
+//                    .HasMaxLength(150);
 
-            builder.Property(u => u.Name)
-                   .IsRequired()
-                   .HasMaxLength(100);
+//             builder.Property(u => u.Name)
+//                    .IsRequired()
+//                    .HasMaxLength(100);
 
-            builder.Property(u => u.Password)
-                   .IsRequired()
-                   .HasMaxLength(200);
+//             builder.Property(u => u.Password)
+//                    .IsRequired()
+//                    .HasMaxLength(200);
 
-            builder.Property(u => u.RoleId)
-                   .IsRequired();
+//             builder.Property(u => u.RoleId)
+//                    .IsRequired();
 
-            // 1-1 relation: User <-> Worker
-            builder.HasOne(u => u.Worker)
-                   .WithOne()
-                   .HasForeignKey<Worker>()
-                   .OnDelete(DeleteBehavior.Cascade);
-        }
-    }
-}
+//             // 1-1 relation: User <-> Worker
+//             builder.HasOne(u => u.Worker)
+//                    .WithOne()
+//                    .HasForeignKey<Worker>()
+//                    .OnDelete(DeleteBehavior.Cascade);
+//         }
+//     }
+// }

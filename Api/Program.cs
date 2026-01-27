@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Application;
 using Serilog;
 using Serilog.Events;
-using Serilog.Sinks.MSSqlServer;
+using Serilog.Sinks.MySQL;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,9 +16,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // DbContext via interface
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 builder.Services.AddDbContext<IApplicationDbContext, AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
+    options.UseMySql(
+        connectionString,
+        ServerVersion.AutoDetect(connectionString) // automatski detektuje verziju MySQL servera
     )
 );
 
@@ -27,9 +30,9 @@ builder.Services.AddApplication();
 // Serilog configuration
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
-    .WriteTo.MSSqlServer(
+    .WriteTo.MySQL(
         connectionString: builder.Configuration.GetConnectionString("DefaultConnection"),
-        sinkOptions: new Serilog.Sinks.MSSqlServer.MSSqlServerSinkOptions { TableName = "Logs", AutoCreateSqlTable = true }
+        tableName: "Logs"
     )
     .CreateLogger();
 
