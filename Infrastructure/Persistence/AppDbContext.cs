@@ -12,7 +12,7 @@ namespace Infrastructure.Persistence
         }
 
         public DbSet<Worker> Workers { get; set; }
-        //public DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<Email> Emails { get; set; }
         public DbSet<Position> Positions { get; set; }
         public DbSet<Shift> Shifts { get; set; }

@@ -1,11 +1,17 @@
 using Application.Interfaces;
+using Infrastructure;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Application;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.MySQL;
+using System.Text;
 using System.Text.Json.Serialization;
+using Api.Extensions;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Application.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +25,10 @@ builder.Services.AddControllers()
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGenWithAuth();
+
+builder.Services
+    .AddApplication();
 
 // DbContext via interface
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -30,7 +40,21 @@ builder.Services.AddDbContext<IApplicationDbContext, AppDbContext>(options =>
     )
 );
 
-builder.Services.AddApplication();
+builder.Services.AddSingleton<TokenProvider>();
+
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(o =>
+    {
+        o.RequireHttpsMetadata = false;
+        o.TokenValidationParameters = new TokenValidationParameters
+        {
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!)),
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 
 // Serilog configuration
 Log.Logger = new LoggerConfiguration()
@@ -40,6 +64,18 @@ Log.Logger = new LoggerConfiguration()
         tableName: "Logs"
     )
     .CreateLogger();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        builder =>
+        {
+
+            builder.WithOrigins("http://localhost:1433", "http://localhost:1434")
+                   .AllowAnyMethod()
+                   .AllowAnyHeader();
+        });
+});
 
 builder.Host.UseSerilog();
 
@@ -61,7 +97,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("AllowFrontend");
 app.UseMiddleware<ExceptionLoggingMiddleware>();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
