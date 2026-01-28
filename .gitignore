@@ -140,3 +140,4 @@ $RECYCLE.BIN/
 *.msp
 
 /api/DockerServer.txt
+/Api/appsettings.json
