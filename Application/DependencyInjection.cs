@@ -29,6 +29,9 @@ namespace Application
             services.AddScoped<IPositionRepository, PositionRepository>();
             services.AddScoped<IPositionService, PositionService>();
 
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserService, UserService>();
+
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             
             return services;
